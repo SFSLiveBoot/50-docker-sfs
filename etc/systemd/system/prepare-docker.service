@@ -1,0 +1,7 @@
+[Unit]
+Before=docker.socket
+
+[Service]
+Type=oneshot
+RemainAfterExit=true
+ExecStart=-/usr/sbin/groupadd -r docker
