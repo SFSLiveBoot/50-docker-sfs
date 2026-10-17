@@ -1,0 +1,24 @@
+#!/bin/sh
+
+set -eu
+
+get_stamp() {
+  stamp="$(curl -fIs "$1" | grep -i ^last-modified: | cut -f2- -d,)" || return 1
+  test -n "$stamp" || return 1
+  date --date="$stamp" +%s
+}
+
+arch="$(dpkg-architecture -q DEB_TARGET_ARCH)"
+set -- $(grep -e ^URIs: -e ^Suites: -e ^Components: "$(dirname "$0")/.sources" | cut -f2 -d" ")
+packages_url="$1/dists/$2/$3/binary-$arch/Packages.gz"
+
+latest_stamp="$(get_stamp "$packages_url")"
+
+# when the component was built with NVIDIA support (ADD_NVIDIA=1 persisted
+# in .env), also consider the libnvidia-container repository stamps
+if test "x${ADD_NVIDIA:-}" = "x1"; then
+  nvidia_stamp="$(get_stamp "https://nvidia.github.io/libnvidia-container/stable/deb/$arch/Packages")" || :
+  test -z "$nvidia_stamp" || test "$nvidia_stamp" -le "$latest_stamp" || latest_stamp="$nvidia_stamp"
+fi
+
+echo "$latest_stamp"

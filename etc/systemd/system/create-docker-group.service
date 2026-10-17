@@ -1,0 +1,14 @@
+[Unit]
+Description=Create docker group (package maintainer scripts do not run for unpacked SFS packages)
+DefaultDependencies=no
+# make sure the group exists before docker.socket (SocketGroup=docker) and
+# before create-user.service adds user 1000 to it
+Before=sockets.target basic.target create-user.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/sbin/groupadd -f docker -r
+RemainAfterExit=yes
+
+[Install]
+WantedBy=basic.target

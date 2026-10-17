@@ -1,0 +1,5 @@
+# docker daemon packages
+# docker-ce-cli and containerd.io are pulled in as dependencies
+docker-ce
+docker-compose-plugin
+docker-buildx-plugin

@@ -1,16 +1,12 @@
 #!/bin/sh
 
-: ${lbu:=/opt/LiveBootUtils}
+: "${lbu:=/opt/LiveBootUtils}"
 . "$lbu/scripts/common.func"
 
-: "${dist:=$(lsb_release -cs)}"
-: "${arch:=$(uname -m)}"
-: "${system:=$(uname -s)}"
+: "${pkgs:=$(sed -Ee 's/(^|[[:space:]])#.*//' "$(dirname "$0")/.pkgs" | grep -v '^$' | tr '\n' ' ')}"
 
-: "${docker_repo:=https://download.docker.com/linux/debian}"
-: "${docker_repo_gpg:=$docker_repo/gpg}"
-: "${docker_pkgs:=docker-ce docker-ce-cli containerd.io}"
-
-: "${docker_compose_ver:=1.26.1}"
-: "${docker_compose_bin:=/usr/local/bin/docker-compose}"
-: "${docker_compose_url:=https://github.com/docker/compose/releases/download/$docker_compose_ver/docker-compose-$system-$arch}"
+: "${nvidia_repo_uri:=https://nvidia.github.io/libnvidia-container/stable/deb/$(dpkg --print-architecture)}"
+: "${nvidia_gpgkey_url:=https://nvidia.github.io/libnvidia-container/gpgkey}"
+: "${nvidia_pkgs:=nvidia-container-toolkit}"
+: "${nvidia_keyring:=/etc/apt/keyrings/nvidia-container-toolkit.asc}"
+: "${nvidia_sources:=/etc/apt/sources.list.d/nvidia-container-toolkit.sources}"
